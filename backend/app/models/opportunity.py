@@ -1,14 +1,18 @@
 """Opportunities (attachments, internships, graduate programs, apprenticeships) and their course tags."""
 import uuid
 from datetime import date, datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Numeric, String, Text, func
 from sqlalchemy import Enum as SAEnum
 from sqlalchemy.dialects.postgresql import TSVECTOR, UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 from app.models.enums import OpportunityStatus, OpportunityType, enum_values
+
+if TYPE_CHECKING:
+    from app.models.company import Company
 
 
 class Opportunity(Base):
@@ -48,6 +52,8 @@ class Opportunity(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
+
+    company: Mapped["Company"] = relationship(back_populates="opportunities", lazy="raise")
 
 
 class OpportunityCourse(Base):

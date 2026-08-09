@@ -1,12 +1,16 @@
 """Companies and organizations that post opportunities."""
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, DateTime, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+
+if TYPE_CHECKING:
+    from app.models.opportunity import Opportunity
 
 
 class Company(Base):
@@ -26,3 +30,5 @@ class Company(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
+
+    opportunities: Mapped[list["Opportunity"]] = relationship(back_populates="company", lazy="raise")
