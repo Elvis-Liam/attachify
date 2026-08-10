@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}{{ opportunity.title }} at {{ opportunity.company.name }} | Attachify{% endblock %}
+
+{% block content %}
+<article class="container opportunity-detail">
+    <a href="/search" class="back-link">&larr; Back to search</a>
+
+    {% if opportunity.is_paid %}<span class="badge">Paid</span>{% endif %}
+    <h1 class="display">{{ opportunity.title }}</h1>
+    <p class="meta">
+        {{ opportunity.company.name }}{% if opportunity.company.verified %} &middot; Verified{% endif %}
+        &middot; {{ opportunity.county or "Location TBC" }}
+    </p>
+    {% if opportunity.application_deadline %}
+    <p class="mono">Deadline: {{ opportunity.application_deadline.strftime("%d %B %Y") }}</p>
+    {% endif %}
+
+    <section>
+        <h2>About this opportunity</h2>
+        <p>{{ opportunity.description }}</p>
+    </section>
+
+    {% if opportunity.requirements %}
+    <section>
+        <h2>Requirements</h2>
+        <p>{{ opportunity.requirements }}</p>
+    </section>
+    {% endif %}
+
+    {% if opportunity.responsibilities %}
+    <section>
+        <h2>Responsibilities</h2>
+        <p>{{ opportunity.responsibilities }}</p>
+    </section>
+    {% endif %}
+</article>
+{% endblock %}

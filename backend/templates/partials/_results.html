@@ -1,0 +1,16 @@
+<p class="results-count mono">{{ total }} opportunit{{ "y" if total == 1 else "ies" }} found</p>
+<div class="results-grid">
+    {% for opp in opportunities %}
+    <a href="/opportunities/{{ opp.id }}" class="card card--result">
+        {% if opp.is_paid %}<span class="badge">Paid</span>{% endif %}
+        <h3>{{ opp.title }}</h3>
+        <p class="meta">{{ opp.company.name }}{% if opp.company.verified %} &middot; Verified{% endif %}</p>
+        <p class="meta">{{ opp.county or "Location TBC" }} &middot; {{ opp.type.replace("_", " ") | title }}</p>
+        {% if opp.application_deadline %}
+        <p class="meta mono">Deadline: {{ opp.application_deadline.strftime("%d %b %Y") }}</p>
+        {% endif %}
+    </a>
+    {% else %}
+    <p>No opportunities match those filters yet.</p>
+    {% endfor %}
+</div>

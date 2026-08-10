@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Search opportunities | Attachify{% endblock %}
+
+{% block content %}
+<div class="container search-layout">
+    <aside class="search-filters">
+        <form hx-get="/search" hx-target="#results" hx-push-url="true" hx-trigger="change, submit">
+            <label>Keyword
+                <input type="text" name="keyword" value="{{ filters.keyword or '' }}" placeholder="e.g. software engineering">
+            </label>
+            <label>County
+                <input type="text" name="county" value="{{ filters.county or '' }}" placeholder="e.g. Nairobi">
+            </label>
+            <label>Type
+                <select name="type">
+                    <option value="">Any</option>
+                    <option value="attachment" {% if filters.type == "attachment" %}selected{% endif %}>Attachment</option>
+                    <option value="internship" {% if filters.type == "internship" %}selected{% endif %}>Internship</option>
+                    <option value="graduate_program" {% if filters.type == "graduate_program" %}selected{% endif %}>Graduate Program</option>
+                    <option value="apprenticeship" {% if filters.type == "apprenticeship" %}selected{% endif %}>Apprenticeship</option>
+                </select>
+            </label>
+            <label class="checkbox">
+                <input type="checkbox" name="is_paid" value="true" {% if filters.is_paid %}checked{% endif %}>
+                Paid only
+            </label>
+            <button type="submit" class="btn btn--primary">Search</button>
+        </form>
+    </aside>
+    <div id="results">
+        {% include "partials/_results.html" %}
+    </div>
+</div>
+{% endblock %}

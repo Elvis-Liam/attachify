@@ -516,46 +516,50 @@ flowchart LR
 
 ## 12. UI/UX Design System
 
-**On "must not look AI-generated":** the brief's own list of things to avoid — gradients, glow, glassmorphism, generic cards — is almost entirely satisfied by one honest design decision: **flat color, thick borders, hard offset shadows, no blur.** That's also the direction that's already landed well for you elsewhere (the portfolio's flat, high-contrast look with hard offset shadows and rotated sticker badges), so rather than inventing a new "premium SaaS" language from scratch, this plan leans into that — and it happens to fit the subject unusually well: **a verification platform's natural vernacular is stamps and seals.** A rotated, hard-shadowed "Verified" badge doesn't just look distinctive, it *means* something specific to what Attachify does.
+**Revision note:** the first pass used a flat, thick-border, hard-shadow treatment matching your portfolio's established look. On seeing it built, that direction didn't fit this product; too heavy, and the multi-hue palette read as dull rather than premium. This section now reflects the revised direction: a single tonal navy-to-blue family, soft rounded forms, and diffused shadows for depth, based on a reference palette you supplied.
 
 **Color tokens:**
 
-| Token | Light | Dark | Use |
-|---|---|---|---|
-| Ink | `#0B0D0C` | `#F2F0E6` | Text, borders (2-3px, always solid) |
-| Paper | `#F7F5EF` | `#121410` | Background |
-| Savanna Green (primary) | `#0F7A4C` | `#3FCB8C` | Brand, primary buttons, verified indicators |
-| Safari Red (accent) | `#E8462A` | `#FF6B4A` | CTAs, deadline-urgency badges |
-| Maize Gold (tertiary) | `#F5B90D` | `#FFCD3C` | Sticker badges, ratings, highlights |
+| Token | Hex | Use |
+|---|---|---|
+| Navy 950 | `#000521` | Page background |
+| Navy 900 | `#020C47` | Card and panel surfaces |
+| Navy 700 | `#011F65` | Elevated surfaces, gradient endpoints |
+| Blue 600 | `#0E4EB2` | Secondary accent |
+| Blue 500 | `#2078CF` | Primary accent: buttons, links, stat numbers |
+| Blue 300 | `#6FA8E8` | Lighter tint for links and badge text on dark surfaces |
+| Text primary | `#F3F7FD` | Headings and primary text |
+| Text secondary | `#A9BEDE` | Body copy, meta labels |
 
-No gradients anywhere. Shadows are flat and un-blurred (`box-shadow: 4px 4px 0 var(--ink)`), which structurally rules out glow and glassmorphism rather than just avoiding them by instruction.
+Two additions (Blue 300 and the text colors) beyond the five supplied hex codes, needed for working contrast on a dark background; everything else traces directly to the reference palette.
+
+Depth comes from soft, blurred shadows (`box-shadow: 0 20px 48px rgba(2,12,71,0.55)`) and generous corner radii (12 to 20px, fully rounded for buttons and badges), not borders or hard offsets. A restrained gradient is used in two places only, the hero background and card surfaces, rather than throughout the page; most of the UI stays on flat solid navy for a calmer, less try-hard feel.
 
 **Type system:**
-- **Display (headings):** Archivo, 800/900 weight — blocky and confident, reads like a stamp/letterhead rather than a delicate editorial face.
-- **Body:** Inter — legible workhorse for descriptions and long text.
-- **Utility/data** (deadlines, stipend amounts, counts, meta labels): a monospace face (JetBrains Mono or Space Mono) — gives data points an "official form" feel that reinforces the verification theme.
+- **Display (headings):** Sora, 600/700 weight. Clean and geometric, reads as modern fintech/tech rather than decorative.
+- **Body:** Inter. Legible workhorse for descriptions and long text.
 
-All three are free (Google Fonts / open license).
+Both are free (Google Fonts).
 
-**Signature element:** the rotated stamp badge — used consistently (not decoratively) for "Verified," "New," "Paid," and countdown-to-deadline states across opportunity cards, company pages, and testimonials. One motif, reused meaningfully, is the memorable thing about the UI rather than scattered flourishes.
+**Signature element:** a small rounded pill badge (`.badge`) in a translucent blue fill, used for "Verified" and "Paid" states. Understated rather than decorative, consistent with the calmer overall direction.
 
-**Icons:** a single consistent SVG set (Lucide or Phosphor, bold weight) — no emoji anywhere, per the brief.
+**Icons:** a single consistent SVG set (Lucide or Phosphor), no emoji anywhere, per the original brief.
 
-**Motion:** minimal and purposeful — the stamp badge's entrance, a button's shadow-compress on press/click (it moves down-right as the shadow "disappears," a satisfying, functional micro-interaction rather than a decorative one) — and `prefers-reduced-motion` respected throughout. No scroll-triggered fade-ins on every section.
+**Motion:** minimal and purposeful; buttons lift slightly on hover with a soft shadow bloom, cards lift on hover in results grids, `prefers-reduced-motion` respected throughout.
 
-**Hero concept:** instead of a generic headline-plus-gradient-blob, the homepage hero shows the product doing its job — headline and tagline on one side, a small stack of real, slightly rotated opportunity cards (like notices pinned to a board) each carrying a stamp badge, on the other. It shows verification rather than describing it.
+**Hero concept:** headline and tagline on one side, a small stack of real featured opportunity cards on the other, set against a subtle radial gradient from Navy 700 into Navy 950. Shows real listings rather than decorative graphics.
 
-**Page notes** (brief — full wireframes are a later, separate pass once this plan is approved):
+**Page notes** (brief; full wireframes are a later, separate pass):
 
 | Page | Note |
 |---|---|
-| Home | Hero (above), "How it works" as a genuine numbered 3-step sequence (search → apply → verified), live stats strip, featured companies, testimonials |
-| Search | Filter sidebar (collapsible on mobile), result cards with stamp badges, HTMX-powered live filtering without full reload |
+| Home | Hero (above), "How it works" as a genuine numbered 3-step sequence (search, apply, verified), live stats strip |
+| Search | Filter sidebar, result cards, HTMX-powered live filtering without full reload |
 | Company detail | Header with verified badge, tabs for open/past opportunities, hiring trend chart, reviews |
 | Resume Builder | Stepper form, live preview pane, template switcher |
 | AI Assistant | Chat UI with visible "grounded in verified listings" indicator and source chips under any listing it references |
 | Dashboard | Saved, applications, alerts, account tabs |
-| 404 | On-brand, not a generic error page — points back to search |
+| 404 | On-brand, not a generic error page; points back to search |
 
 ## 13. SEO Strategy
 
