@@ -9,11 +9,11 @@
     {% if opportunity.is_paid %}<span class="badge">Paid</span>{% endif %}
     <h1 class="display">{{ opportunity.title }}</h1>
     <p class="meta">
-        {{ opportunity.company.name }}{% if opportunity.company.verified %} &middot; Verified{% endif %}
+        <a href="/companies/{{ opportunity.company.slug }}">{{ opportunity.company.name }}</a>{% if opportunity.company.verified %} &middot; Verified{% endif %}
         &middot; {{ opportunity.county or "Location TBC" }}
     </p>
     {% if opportunity.application_deadline %}
-    <p class="mono">Deadline: {{ opportunity.application_deadline.strftime("%d %B %Y") }}</p>
+    <p class="meta">Deadline: {{ opportunity.application_deadline.strftime("%d %B %Y") }}</p>
     {% endif %}
 
     <section>
@@ -32,6 +32,18 @@
     <section>
         <h2>Responsibilities</h2>
         <p>{{ opportunity.responsibilities }}</p>
+    </section>
+    {% endif %}
+
+    {% set original_url = opportunity.external_url or opportunity.source_url %}
+    {% if original_url %}
+    <section class="opportunity-source">
+        <a href="{{ original_url }}" class="btn btn--primary" target="_blank" rel="noopener noreferrer">
+            View the original posting on {{ opportunity.company.name }}'s site
+        </a>
+        {% if "example.com" in original_url %}
+        <p class="meta">Sample listing: this link is a placeholder until the real scraper replaces it with the actual posting.</p>
+        {% endif %}
     </section>
     {% endif %}
 </article>

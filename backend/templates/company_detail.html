@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}{{ company.name }} | Attachify{% endblock %}
+
+{% block content %}
+<article class="container company-detail">
+    <a href="/companies" class="back-link">&larr; All companies</a>
+
+    {% if company.verified %}<span class="badge">Verified</span>{% endif %}
+    <h1 class="display">{{ company.name }}</h1>
+    <p class="meta">
+        {{ company.industry }} &middot; {{ company.county or "Kenya" }}{% if company.town %}, {{ company.town }}{% endif %}
+    </p>
+    {% if company.website %}
+    <p><a href="{{ company.website }}" target="_blank" rel="noopener noreferrer">{{ company.website }}</a></p>
+    {% endif %}
+
+    {% if company.description %}
+    <section>
+        <p>{{ company.description }}</p>
+    </section>
+    {% endif %}
+
+    <section class="company-opportunities">
+        <h2>Open opportunities</h2>
+        {% if opportunities %}
+        <div class="results-grid">
+            {% for opp in opportunities %}
+            <a href="/opportunities/{{ opp.id }}" class="card card--result">
+                {% if opp.is_paid %}<span class="badge">Paid</span>{% endif %}
+                <h3>{{ opp.title }}</h3>
+                <p class="meta">{{ opp.county or "Location TBC" }} &middot; {{ opp.type.replace("_", " ") | title }}</p>
+                {% if opp.application_deadline %}
+                <p class="meta">Deadline: {{ opp.application_deadline.strftime("%d %b %Y") }}</p>
+                {% endif %}
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="meta">No open opportunities right now. Check back soon.</p>
+        {% endif %}
+    </section>
+</article>
+{% endblock %}

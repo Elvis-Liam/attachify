@@ -1,4 +1,4 @@
-"""Server-rendered public pages — home, search, opportunity detail.
+"""Server-rendered public pages: home, search, opportunity detail, companies.
 
 Separate from app/api/v1, which serves JSON. These return HTML, and are excluded
 from the OpenAPI schema since they aren't part of the API surface.
@@ -51,8 +51,8 @@ async def search_page(
         "page": page,
         "filters": {"keyword": keyword, "county": county, "type": type, "is_paid": is_paid},
     }
-    # HTMX marks its own requests with this header — return just the results partial
-    # for those, and the full page (with the same partial included) for a normal visit.
+    # HTMX marks its own requests with this header. Return just the results partial
+    # for those, and the full page, which includes the same partial, for a normal visit.
     if request.headers.get("HX-Request"):
         return templates.TemplateResponse(request=request, name="partials/_results.html", context=context)
     return templates.TemplateResponse(request=request, name="search.html", context=context)
@@ -65,4 +65,25 @@ async def opportunity_detail(request: Request, opportunity_id: uuid.UUID, db: As
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Opportunity not found.")
     return templates.TemplateResponse(
         request=request, name="opportunity_detail.html", context={"opportunity": opportunity}
+    )
+
+
+@router.get("/companies")
+async def companies_list(request: Request, db: AsyncSession = Depends(get_db)):
+    companies, total = await CompanyRepository(db).list_all(per_page=100)
+    return templates.TemplateResponse(
+        request=request, name="companies.html", context={"companies": companies, "total": total}
+    )
+
+
+@router.get("/companies/{slug}")
+async def company_detail(request: Request, slug: str, db: AsyncSession = Depends(get_db)):
+    company = await CompanyRepository(db).get_by_slug(slug)
+    if company is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Company not found.")
+    opportunities, _ = await OpportunityRepository(db).search(company_id=company.id, per_page=50)
+    return templates.TemplateResponse(
+        request=request,
+        name="company_detail.html",
+        context={"company": company, "opportunities": opportunities},
     )

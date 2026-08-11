@@ -223,6 +223,15 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .opportunity-detail section { margin-top: 2rem; }
 .opportunity-detail p { color: var(--text-secondary); }
 
+/* Companies list and company detail */
+.companies-page { padding: 3.5rem 1.5rem; }
+.companies-page .meta { margin-bottom: 2rem; }
+.company-detail { padding: 3.5rem 1.5rem; }
+.company-detail section { margin-top: 2rem; }
+.company-detail p { color: var(--text-secondary); }
+.company-opportunities { margin-top: 3rem; }
+.company-opportunities h2 { margin-bottom: 1.25rem; }
+
 /* Footer */
 .site-footer {
   border-top: 1px solid rgba(255, 255, 255, 0.06);
