@@ -1,0 +1,13 @@
+httpx>=0.27.0
+selectolax>=0.3.21
+sqlalchemy>=2.0.35
+asyncpg>=0.29.0
+pydantic-settings>=2.5.0
+python-dotenv>=1.0.0
+
+# Only needed for sources with needs_js=True. Install separately with:
+#   pip install playwright
+#   playwright install chromium
+# Left out of the default install since most sources shouldn't need it, and
+# the browser binaries alone are a genuinely heavy download.
+# playwright>=1.47.0

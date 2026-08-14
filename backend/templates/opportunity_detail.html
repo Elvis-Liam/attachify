@@ -1,6 +1,15 @@
 {% extends "base.html" %}
 
 {% block title %}{{ opportunity.title }} at {{ opportunity.company.name }} | Attachify{% endblock %}
+{% block description %}{{ opportunity.title }} at {{ opportunity.company.name }} in {{ opportunity.county or "Kenya" }}. {{ "Paid" if opportunity.is_paid else "Unpaid" }} {{ opportunity.type.replace("_", " ") }}, verified on Attachify.{% endblock %}
+{% block og_title %}{{ self.title() }}{% endblock %}
+{% block og_description %}{{ self.description() }}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{{ job_posting_ld | safe }}
+</script>
+{% endblock %}
 
 {% block content %}
 <article class="container opportunity-detail">

@@ -1,11 +1,19 @@
 """Application configuration, loaded from environment variables or a .env file."""
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# Anchored to this file's own location (backend/.env), not the process's
+# current working directory. Without this, Settings() only finds .env when
+# something happens to be launched with backend/ as the working directory,
+# which broke the moment the scraper (a sibling folder) started importing
+# this same module while running from scraper/ instead.
+_ENV_FILE = Path(__file__).resolve().parent.parent.parent / ".env"
+
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(env_file=_ENV_FILE, env_file_encoding="utf-8", extra="ignore")
 
     app_name: str = "Attachify API"
     environment: str = "development"
