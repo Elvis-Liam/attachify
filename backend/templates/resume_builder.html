@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block title %}Resume Builder | Attachify{% endblock %}
+
+{% block content %}
+<div class="container resume-builder-page">
+    <h1 class="display">Resume Builder</h1>
+    <p class="meta">Fill in your details below. You can come back and update this anytime; saving again updates the same resume rather than creating a new one.</p>
+
+    <form id="resume-form" class="auth-form">
+        <section>
+            <h2>Personal Details</h2>
+            <label>Full Name <input type="text" name="full_name" required></label>
+            <label>Email <input type="email" name="email" required></label>
+            <label>Phone <input type="text" name="phone"></label>
+            <label>Location <input type="text" name="location"></label>
+            <label>Summary <textarea name="summary" rows="3"></textarea></label>
+        </section>
+
+        <section>
+            <h2>Education</h2>
+            <label>Institution <input type="text" name="edu_institution"></label>
+            <label>Qualification <input type="text" name="edu_qualification"></label>
+            <label>Field of Study <input type="text" name="edu_field"></label>
+            <label>Start Year <input type="text" name="edu_start"></label>
+            <label>End Year <input type="text" name="edu_end"></label>
+        </section>
+
+        <section>
+            <h2>Experience</h2>
+            <label>Organization <input type="text" name="exp_org"></label>
+            <label>Role <input type="text" name="exp_role"></label>
+            <label>Start Date <input type="text" name="exp_start"></label>
+            <label>End Date <input type="text" name="exp_end"></label>
+            <label>Description <textarea name="exp_description" rows="3"></textarea></label>
+        </section>
+
+        <section>
+            <h2>Skills</h2>
+            <label>Skills, comma separated <input type="text" name="skills" placeholder="Python, SQL, Communication"></label>
+        </section>
+
+        <section>
+            <h2>Template</h2>
+            <label>Choose a template
+                <select name="template">
+                    <option value="modern">Modern</option>
+                    <option value="professional">Professional</option>
+                    <option value="ats_friendly">ATS Friendly</option>
+                    <option value="student">Student</option>
+                </select>
+            </label>
+        </section>
+
+        <p id="resume-message" class="form-message" hidden></p>
+        <button type="submit" class="btn btn--primary">Save Resume</button>
+    </form>
+</div>
+<script>
+requireAuth();
+let existingResumeId = null;
+
+async function loadExistingResume() {
+    const response = await apiFetch("/resumes");
+    const resumes = await response.json();
+    if (!resumes.length) return;
+    existingResumeId = resumes[0].id;
+    const detailResponse = await apiFetch(`/resumes/${existingResumeId}`);
+    const resume = await detailResponse.json();
+    const form = document.getElementById("resume-form");
+    const c = resume.content || {};
+    const personal = c.personal || {};
+    form.full_name.value = personal.full_name || "";
+    form.email.value = personal.email || "";
+    form.phone.value = personal.phone || "";
+    form.location.value = personal.location || "";
+    form.summary.value = personal.summary || "";
+    if (c.education && c.education.length) {
+        const edu = c.education[0];
+        form.edu_institution.value = edu.institution || "";
+        form.edu_qualification.value = edu.qualification || "";
+        form.edu_field.value = edu.field_of_study || "";
+        form.edu_start.value = edu.start_date || "";
+        form.edu_end.value = edu.end_date || "";
+    }
+    if (c.experience && c.experience.length) {
+        const exp = c.experience[0];
+        form.exp_org.value = exp.organization || "";
+        form.exp_role.value = exp.role || "";
+        form.exp_start.value = exp.start_date || "";
+        form.exp_end.value = exp.end_date || "";
+        form.exp_description.value = exp.description || "";
+    }
+    form.skills.value = (c.skills || []).join(", ");
+    form.template.value = resume.template;
+}
+
+function buildContentPayload(form) {
+    const skills = form.skills.value.split(",").map((s) => s.trim()).filter(Boolean);
+    const content = {
+        personal: {
+            full_name: form.full_name.value,
+            email: form.email.value,
+            phone: form.phone.value || null,
+            location: form.location.value || null,
+            summary: form.summary.value || null,
+        },
+        education: [],
+        experience: [],
+        skills: skills,
+    };
+    if (form.edu_institution.value) {
+        content.education.push({
+            institution: form.edu_institution.value,
+            qualification: form.edu_qualification.value,
+            field_of_study: form.edu_field.value || null,
+            start_date: form.edu_start.value || null,
+            end_date: form.edu_end.value || null,
+        });
+    }
+    if (form.exp_org.value) {
+        content.experience.push({
+            organization: form.exp_org.value,
+            role: form.exp_role.value,
+            start_date: form.exp_start.value || null,
+            end_date: form.exp_end.value || null,
+            description: form.exp_description.value || null,
+        });
+    }
+    return content;
+}
+
+document.getElementById("resume-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const messageEl = document.getElementById("resume-message");
+    messageEl.hidden = true;
+    const form = e.target;
+    const payload = { template: form.template.value, content: buildContentPayload(form) };
+    try {
+        const response = existingResumeId
+            ? await apiFetch(`/resumes/${existingResumeId}`, { method: "PATCH", body: JSON.stringify(payload) })
+            : await apiFetch("/resumes", { method: "POST", body: JSON.stringify(payload) });
+        if (!response.ok) {
+            const data = await response.json().catch(() => ({}));
+            messageEl.textContent = data.detail || "Could not save your resume.";
+            messageEl.className = "form-message form-message--error";
+            messageEl.hidden = false;
+            return;
+        }
+        const saved = await response.json();
+        existingResumeId = saved.id;
+        messageEl.textContent = "Saved.";
+        messageEl.className = "form-message form-message--success";
+        messageEl.hidden = false;
+    } catch (err) {
+        // apiFetch already redirects to /login on a 401
+    }
+});
+
+loadExistingResume();
+</script>
+{% endblock %}

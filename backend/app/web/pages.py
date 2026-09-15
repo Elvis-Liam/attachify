@@ -1,8 +1,16 @@
 """Server-rendered public pages: home, search, opportunity detail, companies,
-plus SEO infrastructure (sitemap, robots.txt, structured data).
+auth pages, dashboard, resume builder, plus SEO infrastructure (sitemap,
+robots.txt, structured data).
 
 Separate from app/api/v1, which serves JSON. These return HTML, and are excluded
 from the OpenAPI schema since they aren't part of the API surface.
+
+Auth is deliberately NOT enforced server-side on the dashboard and resume
+builder routes: those pages render a shell, then their own JavaScript calls
+requireAuth() and fetches real data with the bearer token from localStorage.
+The actual protection lives on the API endpoints those pages call, which do
+enforce auth. Serving the shell to a logged-out visitor exposes no data, it
+just bounces them to /login.
 """
 import uuid
 from xml.sax.saxutils import escape as xml_escape
@@ -98,6 +106,26 @@ async def company_detail(request: Request, slug: str, db: AsyncSession = Depends
     )
 
 
+@router.get("/login")
+async def login_page(request: Request):
+    return templates.TemplateResponse(request=request, name="login.html", context={})
+
+
+@router.get("/signup")
+async def signup_page(request: Request):
+    return templates.TemplateResponse(request=request, name="signup.html", context={})
+
+
+@router.get("/dashboard")
+async def dashboard_page(request: Request):
+    return templates.TemplateResponse(request=request, name="dashboard.html", context={})
+
+
+@router.get("/resume-builder")
+async def resume_builder_page(request: Request):
+    return templates.TemplateResponse(request=request, name="resume_builder.html", context={})
+
+
 @router.get("/how-we-verify")
 async def verification_methodology(request: Request):
     return templates.TemplateResponse(request=request, name="verification.html", context={})
@@ -110,6 +138,8 @@ async def robots_txt(request: Request) -> str:
         "User-agent: *\n"
         "Allow: /\n"
         "Disallow: /api/\n"
+        "Disallow: /dashboard\n"
+        "Disallow: /resume-builder\n"
         f"Sitemap: {sitemap_url}\n"
     )
 

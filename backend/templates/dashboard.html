@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | Attachify{% endblock %}
+
+{% block content %}
+<div class="container dashboard-page">
+    <h1 class="display">Welcome<span id="dashboard-name"></span></h1>
+    <p class="meta" id="dashboard-email"></p>
+    <div class="dashboard-actions">
+        <a href="/resume-builder" class="btn btn--primary">Build Your Resume</a>
+        <a href="/search" class="btn btn--secondary">Find Opportunities</a>
+        <button id="logout-btn" class="btn btn--secondary" type="button">Log Out</button>
+    </div>
+</div>
+<script>
+requireAuth();
+(async () => {
+    try {
+        const response = await apiFetch("/auth/me");
+        const user = await response.json();
+        document.getElementById("dashboard-name").textContent = ", " + user.full_name;
+        document.getElementById("dashboard-email").textContent = user.email;
+    } catch (err) {
+        // apiFetch already redirects to /login on a 401
+    }
+})();
+document.getElementById("logout-btn").addEventListener("click", () => {
+    clearTokens();
+    window.location.href = "/";
+});
+</script>
+{% endblock %}

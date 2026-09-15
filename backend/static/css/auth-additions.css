@@ -1,0 +1,88 @@
+/* Styles for the auth, dashboard, and resume builder pages. Kept in a
+   separate file so style.css stays the untouched core design system and
+   these additions can be reviewed on their own. */
+
+.auth-page, .dashboard-page, .resume-builder-page {
+    padding: 3.5rem 1.5rem;
+    max-width: 620px;
+}
+
+.resume-builder-page { max-width: 720px; }
+
+.auth-form label {
+    display: block;
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-bottom: 1.1rem;
+    color: var(--text-secondary);
+}
+
+.auth-form input[type="text"],
+.auth-form input[type="email"],
+.auth-form input[type="password"],
+.auth-form select,
+.auth-form textarea {
+    display: block;
+    width: 100%;
+    margin-top: 0.4rem;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 0.95rem;
+    background: var(--navy-950);
+    color: var(--text-primary);
+}
+
+.auth-form textarea { resize: vertical; }
+
+.auth-form section {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.auth-form section:last-of-type { border-bottom: none; }
+
+.auth-form h2 {
+    font-size: 1.15rem;
+    margin-bottom: 1.25rem;
+}
+
+.form-message {
+    padding: 0.8rem 1rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.form-message--error {
+    background: rgba(232, 70, 42, 0.12);
+    color: #FF8A6B;
+    border: 1px solid rgba(232, 70, 42, 0.3);
+}
+
+.form-message--success {
+    background: rgba(32, 120, 207, 0.12);
+    color: var(--blue-300);
+    border: 1px solid rgba(32, 120, 207, 0.3);
+}
+
+.btn--secondary {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: none;
+}
+
+.btn--secondary:hover {
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: none;
+}
+
+.dashboard-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}

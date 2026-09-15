@@ -3,11 +3,13 @@
 No pytest dependency on purpose, so these run anywhere Python does. Covers what
 this environment can actually verify: normalization, validation, and a source
 parser's selector logic against synthetic HTML built to match the real pattern
-confirmed during research (job links containing "/job/"). It does not and
-cannot cover whether Safaricom's real page matches that synthetic HTML, since
-that needs a live run to find out.
+confirmed during research (list-page card structure, and the real detail-page
+markup for description and the application deadline). It does not and cannot
+cover whether Safaricom's live page still matches that pattern on any given
+day, since that needs a live run to find out, and real sites change.
 """
 import sys
+from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
@@ -15,6 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 from scraper.pipeline.normalize import infer_opportunity_type, normalize_opportunity, normalize_text
 from scraper.pipeline.validate import ValidationError, validate_opportunity
 from scraper.sources import safaricom
+from scraper.sources.safaricom import _split_card_text
 
 passed, failed = 0, 0
 
@@ -67,6 +70,12 @@ try:
 except ValidationError as exc:
     check("a missing title is rejected", "title" in exc.reason)
 
+try:
+    validate_opportunity({**good_record, "description": "This looks like a real sentence but it just trails off..."})
+    check("a description ending in an ellipsis is rejected", False)
+except ValidationError as exc:
+    check("a description ending in an ellipsis is rejected", "truncated" in exc.reason)
+
 print("normalize_opportunity end to end")
 normalized = normalize_opportunity(
     {"title": "  Data   Analyst Internship  ", "description": "Some real description text here for the role."},
@@ -112,9 +121,7 @@ check("title is cleanly split, not the raw concatenated blob", real_results[0]["
 check("county is recovered from the same blob", real_results[0]["county"] == "Kenya")
 check("still gets the right detail_url", real_results[0]["detail_url"].endswith("/job/1438"))
 
-print("_split_card_text against the 4 actual titles from Elvis's real run")
-from scraper.sources.safaricom import _split_card_text
-
+print("_split_card_text against the actual titles from Elvis's real run")
 r1 = _split_card_text("Engineer - Managed Security SolutionsLocationsKenyaPosting Date11/08/2026")
 check("real title 1: clean title", r1["title"] == "Engineer - Managed Security Solutions")
 check("real title 1: county", r1["location"] == "Kenya")
@@ -134,13 +141,45 @@ fallback = _split_card_text("Just A Plain Title With No Metadata")
 check("fallback keeps the whole string as the title", fallback["title"] == "Just A Plain Title With No Metadata")
 check("fallback location is None", fallback["location"] is None)
 
+print("safaricom.parse_detail against the confirmed real detail-page markup shape")
+detail_html = """
+<html><body>
+  <div data-bind="html: pageData().job.description" class="job-details__description-content">
+    <p>Reporting to the Manager, Enterprise IoT and Managed Security Deployment.</p>
+    <p>This role drives the technical, operational, commercial, and regulatory success.</p>
+  </div>
+  <ul>
+    <li class="job-meta__item">
+      <span class="job-meta__title">Job Identification</span>
+      <span class="job-meta__subitem">1410</span>
+    </li>
+    <li class="job-meta__item">
+      <span class="job-meta__title">Apply Before</span>
+      <span class="job-meta__subitem">17/08/2026, 00:00</span>
+    </li>
+  </ul>
+</body></html>
+"""
+detail = safaricom.parse_detail(detail_html)
+check(
+    "description is extracted with real content from both paragraphs",
+    "Reporting to the Manager" in detail["description"] and "regulatory success" in detail["description"],
+)
+check("requirements is honestly None, not guessed at", detail["requirements"] is None)
+check("responsibilities is honestly None, not guessed at", detail["responsibilities"] is None)
+check("deadline is found via the sibling span, not the Job Identification one", detail["application_deadline"] == date(2026, 8, 17))
+
+print("safaricom._find_meta_value ignores a same-labeled span with no matching sibling class")
+from selectolax.parser import HTMLParser as _HP
+tree_only_html = '<span class="job-meta__title">Apply Before</span><span class="something-else">not it</span>'
+no_sibling_result = safaricom._find_meta_value(_HP(tree_only_html), "Apply Before")
+check("returns None rather than the wrong sibling when the class doesn't match", no_sibling_result is None)
+
+print("safaricom.parse_detail when the description div is missing entirely")
+empty_detail = safaricom.parse_detail("<html><body><p>nothing relevant here</p></body></html>")
+check("description is None rather than raising", empty_detail["description"] is None)
+check("deadline is None rather than raising", empty_detail["application_deadline"] is None)
+
 print(f"\n{passed} passed, {failed} failed")
 if failed:
     sys.exit(1)
-
-print("truncated-description rejection")
-try:
-    validate_opportunity({**good_record, "description": "This looks like a real sentence but it just trails off..."})
-    check("a description ending in an ellipsis is rejected", False)
-except ValidationError as exc:
-    check("a description ending in an ellipsis is rejected", "truncated" in exc.reason)

@@ -19,6 +19,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/auth-additions.css">
     <script src="https://unpkg.com/htmx.org@2.0.3" defer></script>
 
     <script type="application/ld+json">
@@ -40,6 +41,9 @@
             <nav class="site-nav" aria-label="Main navigation">
                 <a href="/search">Search</a>
                 <a href="/companies">Companies</a>
+                <a href="/login" id="nav-login">Log In</a>
+                <a href="/signup" id="nav-signup">Sign Up</a>
+                <a href="/dashboard" id="nav-dashboard" hidden>Dashboard</a>
             </nav>
         </div>
     </header>
@@ -51,5 +55,13 @@
             <p>&copy; 2026 Attachify. Built in Kenya. <a href="/how-we-verify">How we verify listings</a></p>
         </div>
     </footer>
+    <script src="/static/js/auth.js"></script>
+    <script>
+        if (typeof isLoggedIn === "function" && isLoggedIn()) {
+            document.getElementById("nav-login").hidden = true;
+            document.getElementById("nav-signup").hidden = true;
+            document.getElementById("nav-dashboard").hidden = false;
+        }
+    </script>
 </body>
 </html>
