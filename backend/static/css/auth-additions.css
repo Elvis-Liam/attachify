@@ -86,3 +86,103 @@
     flex-wrap: wrap;
     margin-top: 2rem;
 }
+
+/* Site logo, cropped in CSS rather than the SVG file itself: the source file
+   (static/images/logo.svg) has an internal clip-path tied to its original
+   canvas coordinates, confirmed by testing, so editing its viewBox directly
+   produced a broken, partially clipped render. This crops purely visually,
+   the file on disk is untouched, byte-identical to what was provided.
+   --logo-height is the only value to change to resize the logo anywhere;
+   every other number here is a verified ratio relative to it, so the crop
+   stays correct at any size. */
+/* Selector deliberately over-specific (repeats the class, adds the parent and
+   the tag) and every property marked !important: style.css was built much
+   earlier in this project and isn't something I can currently see to check
+   for a conflicting rule on "a" elements (a background or display reset is a
+   very common thing for a base stylesheet to set on links). This guarantees
+   this rule wins regardless of what that file contains, rather than risking
+   another guess at the exact conflict. */
+a.site-header__logo.site-header__logo {
+    --logo-height: 40px;
+    display: block !important;
+    height: var(--logo-height) !important;
+    width: calc(var(--logo-height) * 2.9452) !important;
+    background-color: transparent !important;
+    background-image: url('/static/images/logo.svg') !important;
+    background-repeat: no-repeat !important;
+    background-size: calc(var(--logo-height) * 3.2895) calc(var(--logo-height) * 3.2895) !important;
+    background-position: calc(var(--logo-height) * -0.1491) calc(var(--logo-height) * -1.0680) !important;
+    flex-shrink: 0;
+    min-width: calc(var(--logo-height) * 2.9452);
+    min-height: var(--logo-height);
+}
+
+.word-count {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin-top: 0.3rem;
+    font-weight: 400;
+    text-align: right;
+}
+
+.word-count--over {
+    color: #FF8A6B;
+    font-weight: 600;
+}
+
+.word-limited {
+    transition: border-color 0.15s ease;
+}
+
+.repeating-entry {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-sm);
+    padding: 1.1rem 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.repeating-entry__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.8rem;
+}
+
+.repeating-entry__title {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.repeating-entry__remove {
+    background: transparent;
+    border: 1px solid rgba(232, 70, 42, 0.4);
+    color: #FF8A6B;
+    border-radius: var(--radius-sm);
+    padding: 0.3rem 0.7rem;
+    font-size: 0.78rem;
+    cursor: pointer;
+}
+
+.repeating-entry__remove:hover {
+    background: rgba(232, 70, 42, 0.12);
+}
+
+.repeating-entry__checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 400;
+}
+
+.repeating-entry__checkbox input[type="checkbox"] {
+    width: auto;
+}
+
+#education-entries, #experience-entries {
+    margin-bottom: 1rem;
+}

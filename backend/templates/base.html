@@ -6,6 +6,9 @@
     <title>{% block title %}Attachify | Verified attachment and internship opportunities in Kenya{% endblock %}</title>
     <meta name="description" content="{% block description %}The fastest place to discover verified attachment and internship opportunities in Kenya, powered by AI.{% endblock %}">
     <meta name="theme-color" content="#000521">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32.png?v=20260917">
+    <link rel="icon" type="image/png" sizes="192x192" href="/static/images/favicon-192.png?v=20260917">
+    <link rel="apple-touch-icon" href="/static/images/favicon-192.png?v=20260917">
     <link rel="canonical" href="{% block canonical %}{{ request.url }}{% endblock %}">
 
     <meta property="og:type" content="website">
@@ -18,9 +21,21 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="/static/css/auth-additions.css">
+    <link rel="stylesheet" href="/static/css/style.css?v=20260917">
+    <link rel="stylesheet" href="/static/css/auth-additions.css?v=20260917">
     <script src="https://unpkg.com/htmx.org@2.0.3" defer></script>
+    <!-- Loaded in <head>, deliberately: pages like dashboard.html and
+         resume_builder.html call requireAuth() immediately, at the top of
+         their own script, not inside an event handler. If auth.js loaded
+         at the bottom of the body instead (where it used to be), those
+         calls would run before the file defining them ever loaded, since
+         the page's own content is inserted higher up than the bottom of
+         the body. That's not a hypothetical, it's the exact
+         "requireAuth is not defined" error this fixes. auth.js only
+         defines functions and reads/writes localStorage, so loading it
+         this early is safe; it doesn't touch the DOM until something
+         actually calls one of its functions. -->
+    <script src="/static/js/auth.js?v=20260917"></script>
 
     <script type="application/ld+json">
     {
@@ -37,7 +52,7 @@
     <a href="#main" class="skip-link">Skip to content</a>
     <header class="site-header">
         <div class="container site-header__inner">
-            <a href="/" class="site-header__logo">Attachify</a>
+            <a href="/" class="site-header__logo" aria-label="Attachify home"></a>
             <nav class="site-nav" aria-label="Main navigation">
                 <a href="/search">Search</a>
                 <a href="/companies">Companies</a>
@@ -55,7 +70,6 @@
             <p>&copy; 2026 Attachify. Built in Kenya. <a href="/how-we-verify">How we verify listings</a></p>
         </div>
     </footer>
-    <script src="/static/js/auth.js"></script>
     <script>
         if (typeof isLoggedIn === "function" && isLoggedIn()) {
             document.getElementById("nav-login").hidden = true;

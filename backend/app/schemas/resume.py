@@ -7,9 +7,15 @@ import uuid
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 ResumeTemplate = Literal["modern", "professional", "ats_friendly", "student"]
+
+# ~1500 words at a generous 7 characters/word average (word length plus a
+# space), rounded up. The frontend enforces the 1500-word limit itself with a
+# live counter; this is the server-side backstop for anyone bypassing that,
+# not the primary UX.
+_LONG_TEXT_MAX_CHARS = 10500
 
 
 class PersonalDetails(BaseModel):
@@ -17,7 +23,7 @@ class PersonalDetails(BaseModel):
     email: EmailStr
     phone: str | None = None
     location: str | None = None
-    summary: str | None = None
+    summary: str | None = Field(default=None, max_length=_LONG_TEXT_MAX_CHARS)
     linkedin_url: str | None = None
     portfolio_url: str | None = None
 
@@ -37,7 +43,7 @@ class ExperienceEntry(BaseModel):
     start_date: str | None = None
     end_date: str | None = None
     is_current: bool = False
-    description: str | None = None
+    description: str | None = Field(default=None, max_length=_LONG_TEXT_MAX_CHARS)
 
 
 class ProjectEntry(BaseModel):
